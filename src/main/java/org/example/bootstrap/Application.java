@@ -80,7 +80,7 @@ public class Application {
                         String hashedPassword = new HmacUtils(HMAC_SHA_224, "secret".getBytes()).hmacHex(generale.keyWord);
                         if (hashedPassword.equals(a.recipe.uniqueKey)) {
                             System.out.println("Рецепт прошел проверку на подлинность");
-                            k = keyboard.nextLine();
+                            k = "4";
                             break;
                         }
                     }
