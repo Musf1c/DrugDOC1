@@ -8,6 +8,7 @@ import org.apache.commons.codec.digest.HmacUtils;
 import org.example.service.FileUtils;
 import org.example.service.Menu;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
@@ -52,19 +53,23 @@ public class Application {
         }
         if (input.equals("1")) {
             System.out.println("_______________________________________________________________");
-            System.out.println("Введите название препарата: ");
-            String title = keyboard.nextLine();
             boolean isDrugAvailable = false;
-            for (AvailabilityOfDrug availability : a.availabilityOfDrugs) {
-                if (availability.getTitleDrug().equals(title)) {
-                    System.out.println(title + " есть в наличии");
-                    isDrugAvailable = true;
-                    break;
+            while (!isDrugAvailable) {
+                System.out.println("Введите название препарата: ");
+                String title = keyboard.nextLine();
+                for (AvailabilityOfDrug availability : a.availabilityOfDrugs) {
+                    if (availability.getTitleDrug().equals(title)) {
+                        System.out.println(title + " есть в наличии");
+                        isDrugAvailable = true;
+                        break;
+                    }
+                }
+                if (!isDrugAvailable) {
+                    System.out.println(title + " нет в наличии");
                 }
             }
-            if (!isDrugAvailable) {
-                System.out.println(title + " нет в наличии");
-            }
+
+
             System.out.println("_______________________________________________________________");
             menu.printMenu();
             input = keyboard.nextLine();
@@ -72,15 +77,22 @@ public class Application {
 
         if (input.equals("2")) {
             System.out.println(a.recipe);
+            String[] massDate = a.recipe.dateOfAction.split("-");
+            LocalDate otherDate = LocalDate.of(Integer.parseInt(massDate[2]), Integer.parseInt(massDate[1]), Integer.parseInt(massDate[0]));
+            LocalDate nowDate = LocalDate.now();
+            if (nowDate.isAfter(otherDate)) {
+                System.out.println("Рецепт просрочен");
+                System.exit(0);
+            }
             menu.printMenu1();
-            String k = keyboard.nextLine();
+            String k = "";
             while (!k.equals("4")) {
+                k = keyboard.nextLine();
                 if (k.equals("1")) {
                     for (GeneraleRecipeKey generale : a.generaleRecipeKeys) {
                         String hashedPassword = new HmacUtils(HMAC_SHA_224, "secret".getBytes()).hmacHex(generale.keyWord);
                         if (hashedPassword.equals(a.recipe.uniqueKey)) {
                             System.out.println("Рецепт прошел проверку на подлинность");
-                            k = "4";
                             break;
                         }
                     }
